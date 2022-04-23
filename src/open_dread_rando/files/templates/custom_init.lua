@@ -1,4 +1,5 @@
 Game.ImportLibrary("system/scripts/init_original.lua")
+Game.ImportLibrary("system/scripts/logutil.lua")
 
 local initOk, errorMsg = pcall(function()
 
