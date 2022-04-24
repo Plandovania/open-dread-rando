@@ -6,9 +6,9 @@ logutil = {
 
 Game.LogWarn(0, "Loading logutil.lua")
 
-local MAX_MESSAGES = 50
+local MAX_MESSAGES = 40
 local LINE_HEIGHT = 0.02
-local MESSAGE_LIFETIME = 5
+local MESSAGE_LIFETIME = 30
 local MESSAGE_FADE_TIME = 0.3
 local LEVEL_COLORS = {
     default = { ColorR = 1.0, ColorG = 1.0, ColorB = 1.0, ColorA = 1.0 },
@@ -46,7 +46,7 @@ function LogMessage.Create(level, text)
 
     local msgName = "LogMessage" .. obj.id
 
-    obj.root = GUI.CreateDisplayObjectEx(msgName, "CDisplayObjectContainer", { StageID = "Up", X = "0.0", Y = "0.0", SizeX = "2.0", SizeY = "2.0", ScaleX = "0.5", ScaleY = "0.5", ColorA = "1.0" })
+    obj.root = GUI.CreateDisplayObjectEx(msgName, "CDisplayObjectContainer", { StageID = "Up", X = "0.0", Y = "0.0", SizeX = "1.0", SizeY = tostring(LINE_HEIGHT + 0.04), ScaleX = "1.0", ScaleY = "1.0", ColorA = "1.0" })
     obj.level = GUI.CreateDisplayObject(obj.root, msgName .. "_Level", "CLabel", { StageID = "Up", X = "0.02", Y = "0.02", ScaleX = "1.0", ScaleY = "1.0", Font = "digital_small", TextAlignment = "Left", Text = level })
     obj.text = GUI.CreateDisplayObject(obj.root, msgName .. "_Text", "CLabel", { StageID = "Up", X = "0.04", Y = "0.02", ScaleX = "1.0", ScaleY = "1.0", Font = "digital_small", TextAlignment = "Left", Text = text })
 
@@ -64,7 +64,7 @@ function LogMessage:Destroy()
 end
 
 function LogMessage:SetPosition(line)
-    GUI.SetHierarchyProperties(self.root, { Y = tostring(LINE_HEIGHT * line) })
+    GUI.SetHierarchyProperties(self.root, { Y = tostring(1.0 - LINE_HEIGHT * (line + 2)) })
 end
 
 function LogMessage:FadeOut(time)
@@ -81,19 +81,28 @@ end
 function logutil.main_Delayed()
     local root = GUI.GetDisplayObject("[Root]")
 
+    if logutil.messages then
+        for i = 1, #logutil.messages do
+            if logutil.messages[i] then
+                logutil.messages[i]:Destroy()
+            end
+        end
+    end
+
     if logutil.messageContainer then
         GUI.DestroyDisplayObject(logutil.messageContainer)
     end
 
+    logutil.messages = {}
     logutil.messageContainer = GUI.CreateDisplayObjectEx("MessageContainer", "CDisplayObjectContainer", {
         Enabled = true,
         Visible = true,
         X = "0.0",
         Y = "0.0",
-        SizeX = "1.0",
-        SizeY = "1.0",
-        ScaleX = "1.0",
-        ScaleY = "1.0",
+        SizeX = "2.0",
+        SizeY = "2.0",
+        ScaleX = "0.5",
+        ScaleY = "0.5",
         Angle = "0.0",
         ColorR = "1.0",
         ColorG = "1.0",
@@ -124,10 +133,19 @@ function logutil.Log(level, format, ...)
         logutil.PopOldestMessage()
     end
 
-    table.insert(logutil.messages, message)
+    table.insert(logutil.messages, 1, message)
     logutil.messageContainer:AddChild(message.root)
-    message:SetPosition(#logutil.messages)
+
+    Game.AddSF(0.1, "logutil.RepositionMessages", "")
     Game.AddSF(MESSAGE_LIFETIME, "logutil.FadeMessage", "i", message.id)
+end
+
+function logutil.RepositionMessages()
+    for i = 1, #logutil.messages do
+        if logutil.messages[i] then
+            logutil.messages[i]:SetPosition(i)
+        end
+    end
 end
 
 function logutil.GetNextId()
@@ -160,11 +178,9 @@ function logutil.PopMessageAt(index)
         end
 
         logutil.messages[i] = logutil.messages[i + 1]
-
-        if logutil.messages[i] then
-            logutil.messages[i]:SetPosition(i)
-        end
     end
+
+    Game.AddSF(0.1, "logutil.RepositionMessages", "")
 end
 
 function logutil.PopMessage(id)
@@ -190,7 +206,7 @@ function logutil.FadeMessage(id, time)
 end
 
 function logutil.PopOldestMessage()
-    logutil.PopMessageAt(1)
+    logutil.PopMessageAt(#logutil.messages)
 end
 
 function logutil.PatchFunctions(tab, name)
