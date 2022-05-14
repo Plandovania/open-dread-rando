@@ -115,6 +115,7 @@ def create_custom_init(editor: PatcherEditor, configuration: dict) -> str:
         "room_id_fade_time": FadeTimes.NO_FADE.value if (
             cosmetic_options["enable_room_name_display"] != "WITH_FADE"
             ) else FadeTimes.ROOM_FADE.value,
+        "show_debug_logs": cosmetic_options["show_debug_logs"],
         "layout_uuid": layout_uuid,
     }
 
