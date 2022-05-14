@@ -32,6 +32,8 @@ def _read_schema():
 
 
 def create_custom_init(editor: PatcherEditor, configuration: dict):
+    cosmetic_options: dict = configuration["cosmetic_patches"]["lua"].get("custom_init", {})
+    show_debug_logs: bool = cosmetic_options.get("show_debug_logs", False)
     inventory: dict[str, int] = configuration["starting_items"]
     starting_location: dict = configuration["starting_location"]
     starting_text: list[list[str]] = configuration.get("starting_text", [])
@@ -77,6 +79,7 @@ def create_custom_init(editor: PatcherEditor, configuration: dict):
 
     replacement = {
         "enable_remote_lua": enable_remote_lua,
+        "show_debug_logs": show_debug_logs,
         "new_game_inventory": final_inventory,
         "starting_scenario": lua_util.wrap_string(starting_location["scenario"]),
         "starting_actor": lua_util.wrap_string(starting_location["actor"]),
