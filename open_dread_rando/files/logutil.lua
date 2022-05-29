@@ -79,6 +79,13 @@ function logutil.main()
 end
 
 function logutil.main_Delayed()
+    -- Pop all messages when loading begins
+    local old_guicallbacks_OnLoadScenarioRequest = guicallbacks.OnLoadScenarioRequest
+    guicallbacks.OnLoadScenarioRequest = function(...)
+        old_guicallbacks_OnLoadScenarioRequest()
+        logutil.PopAllMessages()
+    end
+
     local root = GUI.GetDisplayObject("[Root]")
 
     if logutil.messages then
@@ -207,6 +214,12 @@ end
 
 function logutil.PopOldestMessage()
     logutil.PopMessageAt(#logutil.messages)
+end
+
+function logutil.PopAllMessages()
+    while #logutil.messages > 0 do
+        logutil.PopOldestMessage()
+    end
 end
 
 function logutil.PatchFunctions(tab, name)
