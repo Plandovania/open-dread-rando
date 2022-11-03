@@ -229,7 +229,7 @@ function logutil.PatchFunctions(tab, name)
             local orig = value
             local funcName = ("%s.%s"):format(name, key)
 
-            logutil[key] = logutil.WrapFunctionInErrorHandler(orig, funcName)
+            tab[key] = logutil.WrapFunctionInErrorHandler(orig, funcName)
         end
     end
 end
