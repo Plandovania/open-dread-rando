@@ -221,13 +221,6 @@ def patch_extracted(input_path: Path, output_path: Path, configuration: dict):
     # Update cc_to_room_name.lua
     create_collision_camera_table(editor, configuration)
 
-    # Add log_util.lc
-    editor.add_new_asset(
-        "system/scripts/logutil.lc",
-        Path(__file__).parent.joinpath("files", "logutil.lua").read_text().encode("utf-8"),
-        editor.find_pkgs("system/scripts/init.lc")
-    )
-
     # Update scenario.lc
     lua_util.replace_script(editor, "system/scripts/scenario", "custom_scenario.lua")
 
