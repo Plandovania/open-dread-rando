@@ -32,6 +32,8 @@ def _read_schema():
 
 
 def create_custom_init(editor: PatcherEditor, configuration: dict):
+    cosmetic_options: dict = configuration["cosmetic_patches"]["lua"].get("custom_init", {})
+    show_debug_logs: bool = cosmetic_options.get("show_debug_logs", False)
     inventory: dict[str, int] = configuration["starting_items"]
     starting_location: dict = configuration["starting_location"]
     starting_text: list[list[str]] = configuration.get("starting_text", [])
@@ -77,6 +79,7 @@ def create_custom_init(editor: PatcherEditor, configuration: dict):
 
     replacement = {
         "enable_remote_lua": enable_remote_lua,
+        "show_debug_logs": show_debug_logs,
         "new_game_inventory": final_inventory,
         "starting_scenario": lua_util.wrap_string(starting_location["scenario"]),
         "starting_actor": lua_util.wrap_string(starting_location["actor"]),
@@ -167,6 +170,13 @@ def patch_extracted(input_path: Path, output_path: Path, configuration: dict):
     editor.replace_asset(
         "system/scripts/init.lc",
         create_custom_init(editor, configuration).encode("ascii"),
+    )
+
+    # Add log_util.lc
+    editor.add_new_asset(
+        "system/scripts/logutil.lc",
+        Path(__file__).parent.joinpath("files", "logutil.lua").read_text().encode("utf-8"),
+        editor.find_pkgs("system/scripts/init.lc")
     )
 
     # Update scenario.lc
