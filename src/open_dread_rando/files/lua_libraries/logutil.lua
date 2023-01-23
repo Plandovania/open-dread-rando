@@ -27,6 +27,7 @@ Game.MemoryStatsAllowed = function() return true end
 local Game_Log_Original = Game.Log
 local Game_LogWarn_Original = Game.LogWarn
 local Game_LogError_Original = Game.LogError
+local print_Original = print
 
 local LogMessage = {}
 LogMessage.__index = LogMessage
@@ -48,7 +49,7 @@ function LogMessage.Create(level, text)
 
     obj.root = GUI.CreateDisplayObjectEx(msgName, "CDisplayObjectContainer", { StageID = "Up", X = "0.0", Y = "0.0", SizeX = "1.0", SizeY = tostring(LINE_HEIGHT + 0.04), ScaleX = "1.0", ScaleY = "1.0", ColorA = "1.0" })
     obj.level = GUI.CreateDisplayObject(obj.root, msgName .. "_Level", "CLabel", { StageID = "Up", X = "0.02", Y = "0.02", ScaleX = "1.0", ScaleY = "1.0", Font = "digital_small", TextAlignment = "Left", Text = level })
-    obj.text = GUI.CreateDisplayObject(obj.root, msgName .. "_Text", "CLabel", { StageID = "Up", X = "0.04", Y = "0.02", ScaleX = "1.0", ScaleY = "1.0", Font = "digital_small", TextAlignment = "Left", Text = text })
+    obj.text = GUI.CreateDisplayObject(obj.root, msgName .. "_Text", "CLabel", { StageID = "Up", X = "0.04", Y = "0.02", ScaleX = "1.0", ScaleY = "1.0", Font = "digital_small", TextAlignment = "Left", Text = string.gsub(text, "|", "l") })
 
     GUI.SetProperties(obj.level, colors)
     GUI.SetProperties(obj.text, colors)
@@ -129,6 +130,11 @@ function logutil.main_Delayed()
     Game.LogError = function(_, message)
         Game_LogError_Original(_, message)
         logutil.Log("E", message)
+    end
+
+    _G.print = function(message)
+        logutil.Log("D", message)
+        print_Original(message)
     end
 end
 
