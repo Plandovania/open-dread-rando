@@ -107,6 +107,18 @@ function Scenario.InitScenario(arg1, arg2, arg3, arg4)
         Game.AddSF(0.9, Init.SaveGameAtStartingLocation, "")
         Game.AddSF(0.8, Scenario.ShowText, "")
     end
+
+    Game.AddSF(0.5, Scenario.CheckForEnvironmentMusic, "")
+end
+
+function Scenario.CheckForEnvironmentMusic()
+    if not Game.IsMusicPlaying() then
+        Game.PlayCurrentEnvironmentMusic()
+        Game.LogWarn(0, "Start music")
+    else
+        Game.LogWarn(0, "Music already playing")
+    end
+
 end
 
 local fatal_messages_seen = 0
