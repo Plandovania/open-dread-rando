@@ -5,6 +5,7 @@ Game.DoFile("system/scripts/data_structures.lua")
 Game.DoFile("system/scripts/guilib.lua")
 Game.DoFile("system/scripts/death_counter.lua")
 Game.DoFile("system/scripts/room_names.lua")
+Game.DoFile("system/scripts/practice_mod.lua")
 
 Scenario.tRandoHintPropIDs = {
     CAVE_1 = Blackboard.RegisterLUAProp("HINT_CAVE_1", "bool"),
@@ -255,6 +256,8 @@ function Scenario.OnLoadScenarioFinished()
 
     Game.AddSF(0, "Scenario.CheckDebugInputs", "")
     RL.UpdateRDVClient(true)
+
+    PracticeMod.Init()
 
     local teleportal_id = Blackboard.GetProp("GAME_PROGRESS", "RandoUnlockTeleportal")
     if teleportal_id == nil then return end
